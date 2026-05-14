@@ -1,0 +1,30 @@
+
+REQUEST: https://tools-httpstatus.pickup-services.com//posts/1
+ERROR!!!
+HTTP STATUS CODE: 403
+BODY: error code: 1010
+EXCEPTION: Request failed with status code 403
+
+REQUEST: https://tools-httpstatus.pickup-services.com//posts/2
+ERROR!!!
+HTTP STATUS CODE: 403
+BODY: error code: 1010
+EXCEPTION: Request failed with status code 403
+
+REQUEST: https://tools-httpstatus.pickup-services.com//posts/3
+ERROR!!!
+HTTP STATUS CODE: 403
+BODY: error code: 1010
+EXCEPTION: Request failed with status code 403
+
+REQUEST: https://tools-httpstatus.pickup-services.com//posts/4
+ERROR!!!
+HTTP STATUS CODE: 403
+BODY: error code: 1010
+EXCEPTION: Request failed with status code 403
+
+REQUEST: https://tools-httpstatus.pickup-services.com//posts/5
+ERROR!!!
+HTTP STATUS CODE: 403
+BODY: error code: 1010
+EXCEPTION: Request failed with status code 403
