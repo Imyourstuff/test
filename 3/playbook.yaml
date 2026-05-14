@@ -13,13 +13,18 @@
       set_fact:
         is_local: "{{ inventory_hostname == 'localhost' }}"
 
+    - name: Set package names based on OS
+      set_fact:
+        docker_pkg: "{{ 'docker' if ansible_os_family == 'Archlinux' else 'docker.io' }}"
+
+    # Заменил на универсальную штуку вместо apt и pacman
     - name: Install packages for work
-      pacman:
+      package:
         name:
           - ca-certificates
           - curl
           - git
-          - docker
+          - "{{docker_pkg}}"
         state: present
 
     - name: Start Docker
@@ -38,7 +43,7 @@
       command: docker --version
       register: docker_version
     
-    - name: Print docker version
+    - name: Check for docker installation
       debug:
         var: docker_version.stdout
 
@@ -63,8 +68,19 @@
     - name: Build docker image
       shell: docker build -t {{image_name}} {{app_path}}
         
-    - name: Run container
-      shell: docker run -d --name {{container_name}} {{image_name}}
+    # Обход уже существующего контейнера
+    - name: Check if container already exists
+      command: docker ps -a --filter "name=^{{ container_name }}$" --format "{{ '{{.Names}}' }}"
+      register: container_check
+      changed_when: false
+
+    - name: Start existing container if stopped
+      command: docker start {{ container_name }}
+      when: container_check.stdout == container_name
+
+    - name: Run new container if not exists
+      shell: docker run -d --name {{ container_name }} {{ image_name }}
+      when: container_check.stdout != container_name
 
     - name: Wait for container to finish
       command: docker wait {{ container_name }}
