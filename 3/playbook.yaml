@@ -14,19 +14,12 @@
         is_local: "{{ inventory_hostname == 'localhost' }}"
 
     - name: Install packages for work
-      apt:
+      pacman:
         name:
           - ca-certificates
           - curl
           - git
-        #  - gnupg
-        #  - lsb-release
-        update_cache: yes
-
-    # Установка и запуск Docker
-    - name: Install Docker
-      apt:
-        name: docker.io
+          - docker
         state: present
 
     - name: Start Docker
@@ -37,7 +30,7 @@
 
     - name: Add user to docker group
       user:
-        name: "{{ansible_user}}"
+        name: "{{ lookup('env', 'USER') }}"
         groups: docker
         append: yes
 
@@ -61,6 +54,10 @@
        dest: "{{app_path}}"
        version: main
        force: yes
+
+    # Костыль страшно
+    - name: Extracting from folders
+      shell: mv {{ app_path }}/2/* {{ app_path }}/
 
     # Собираем и запускаем контейнер
     - name: Build docker image
