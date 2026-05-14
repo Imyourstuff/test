@@ -63,7 +63,7 @@
 
     # Костыль страшно
     - name: Extracting from folders
-      shell: mv {{ app_path }}/2/* {{ app_path }}/
+      shell: mv {{ app_path }}/3/* {{ app_path }}/
 
     # Собираем и запускаем контейнер
     - name: Build docker image

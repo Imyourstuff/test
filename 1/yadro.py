@@ -1,5 +1,6 @@
 import urllib.request
 import urllib.error
+import sys
 
 URL = "https://tools-httpstatus.pickup-services.com/"
 
@@ -28,9 +29,6 @@ def sendRequest(url: str):
     if 100 <= response_code < 400:
         print(f"HTTP STATUS CODE: {response_code}")
         print(f"BODY: {response_body}")
-    else:
-        print(f"Request not successfull!!!\n. ERROR CODE: {response_code}")
-        print(f"BODY: {response_body}")
 
 dummy_requests = [
     f"{URL}/posts/1",
@@ -45,3 +43,5 @@ for url in dummy_requests:
         sendRequest(url)
     except httpReqException as e:
         print(f"EXCEPTION: {e}")
+        sys.exit(1)
+sys.exit(0)
