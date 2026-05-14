@@ -1,0 +1,93 @@
+- name: Install Docker and run HTTP script container
+  hosts: all
+  become: true
+
+  vars:
+    project_url: "https://github.com/Imyourstuff/test.git"
+    image_name: yadro
+    container_name: yadro
+    app_path: /opt/yadro
+
+  tasks:
+    - name: Localhost or Inventory
+      set_fact:
+        is_local: "{{ inventory_hostname == 'localhost' }}"
+
+    - name: Install packages for work
+      apt:
+        name:
+          - ca-certificates
+          - curl
+          - git
+        #  - gnupg
+        #  - lsb-release
+        update_cache: yes
+
+    # Установка и запуск Docker
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Start Docker
+      systemd:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Add user to docker group
+      user:
+        name: "{{ansible_user}}"
+        groups: docker
+        append: yes
+
+    - name: Check docker version
+      command: docker --version
+      register: docker_version
+    
+    - name: Print docker version
+      debug:
+        var: docker_version.stdout
+
+    - name: Create app directory
+      file:
+        path: "{{app_path}}"
+        state: directory
+
+    # Пробуем подтянуть актуальные файлы c Git
+    - name: Copy project files from GitHub
+      ansible.builtin.git:
+       repo: "{{project_url}}"
+       dest: "{{app_path}}"
+       version: main
+       force: yes
+
+    # Собираем и запускаем контейнер
+    - name: Build docker image
+      shell: docker build -t {{image_name}} {{app_path}}
+        
+    - name: Run container
+      shell: docker run -d --name {{container_name}} {{image_name}}
+
+    - name: Wait for container to finish
+      command: docker wait {{ container_name }}
+      register: container_exit
+
+    # Логи
+    - name: Get container logs
+      command: docker logs {{ container_name }}
+      register: logs
+
+    - name: Print logs!
+      debug:
+        var: logs.stdout
+
+    # Проверка
+    - name: Check
+      fail:
+        msg: "Container failed"
+      when: container_exit.stdout != "0"
+
+    - name: What?
+      debug:
+        msg: "Playbook finished."
