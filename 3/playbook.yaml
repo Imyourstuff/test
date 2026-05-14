@@ -17,7 +17,8 @@
       set_fact:
         docker_pkg: "{{ 'docker' if ansible_os_family == 'Archlinux' else 'docker.io' }}"
 
-    # Заменил на универсальную штуку вместо apt и pacman
+    # Заменил на универсальную штуку вместо apt и pacman, разные имена в ubuntu и арче для докера
+    # Ломают скрипт
     - name: Install packages for work
       package:
         name:
